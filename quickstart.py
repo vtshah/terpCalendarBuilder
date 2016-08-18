@@ -24,10 +24,6 @@ EVENT = {
     'summary': 'Party',
     'start':  {'dateTime': '2016-08-21T22:00:00%s' % GMT_OFF},
     'end':    {'dateTime': '2016-08-21T22:00:00%s' % GMT_OFF},
-    'attendees': [
-        {'email': 'friend1@example.com'},
-        {'email': 'friend2@example.com'},
-    ]
 }
 
 EVENT1 = {
@@ -39,6 +35,10 @@ EVENT1 = {
         {'email': 'friend2@example.com'},
     ]
 }
+
+
+print(EVENT)
+print(EVENT1)
 
 e = CAL.events().insert(calendarId='primary',
         sendNotifications=True, body=EVENT).execute()

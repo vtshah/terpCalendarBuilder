@@ -39,7 +39,7 @@ def createEventJSON(instructors, meetingsArr):
         }
         events.append(event)
     return events
-    
+
 def findReccurences(days):
     recurrArr = []
     if('M' in days):
@@ -56,7 +56,7 @@ def findReccurences(days):
     return recurrArr
     
 def CreateRRuleString(recurrArr):
-    rrule = "RRULE: FREQ=WEEKLY;BYDAY="
+    rrule = "RRULE:FREQ=WEEKLY;BYDAY="
     for x in recurrArr:
         rrule = rrule + x + ','
     rrule = rrule[:-1]
@@ -133,6 +133,7 @@ def last_weekday(d, weekday):
 
 
 
+
 try:
     import argparse
     flags = argparse.ArgumentParser(parents=[tools.argparser]).parse_args()
@@ -149,12 +150,30 @@ if not creds or creds.invalid:
 CAL = build('calendar', 'v3', http=creds.authorize(Http()))
 
 events = createEventJSON(instructors, meetingsArr)
+print(events[0])
+
+event = {
+	'end': {
+		'timeZone': 'America/New_York',
+		'dateTime': '2016-12-09T16:50:00'
+		},
+	'description': 'Taught By: Evan Golub. The class is located in HJP in room 0226',
+	'summary': 'CMSC131', 
+	'start': {
+		'timeZone': 'America/New_York',
+		'dateTime': '2016-08-29T16:00:00'
+		},
+	'location': '38.98708535, -76.9432766035148',
+	'recurrence':[
+		'RRULE:FREQ=WEEKLY;BYDAY=MO,WE,FR'
+	]
+	}
+
+print(event) 
 
 e = CAL.events().insert(calendarId='primary',
         sendNotifications=True, body=events[0]).execute()
 
-e = CAL.events().insert(calendarId='primary',
-        sendNotifications=True, body=events[1]).execute()
 
 print('''*** %r event added:
     Start: %s
