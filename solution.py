@@ -20,7 +20,6 @@ def createEventJSON(instructors, meetingsArr):
     for x in meetingsArr:
         days = x['days']
         print(determine_start(days, x['start_time']))
-	GMT_OFF = '-07:00'
         event = {
             'summary': courseName,
             'description': str('Taught By: ' + instructors + '. The class is located in ' + x['building'] + ' in room ' + x['room']),
@@ -30,11 +29,11 @@ def createEventJSON(instructors, meetingsArr):
 		'timeZone' : 'America/New_York'
              },
             'end' : {
-		'dateTime' : str(determine_end(days, x['end_time']).isoformat()),
+		'dateTime' : str(determine_start(days, x['end_time']).isoformat()),
 		'timeZone' : 'America/New_York'
 	     },
             'recurrence' : [
-                CreateRRuleString(findReccurences(days))
+                CreateRRuleString(findReccurences(days), days)
             ]
         }
         events.append(event)
@@ -55,11 +54,14 @@ def findReccurences(days):
     
     return recurrArr
     
-def CreateRRuleString(recurrArr):
+def CreateRRuleString(recurrArr, days):
     rrule = "RRULE:FREQ=WEEKLY;BYDAY="
     for x in recurrArr:
         rrule = rrule + x + ','
     rrule = rrule[:-1]
+    rrule = rrule + ';UNTIL'
+    rrule = rrule + str(determine_start(days, x['end_time']).isoformat())
+    
     return rrule
     
     
