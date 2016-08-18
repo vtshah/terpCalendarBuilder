@@ -19,6 +19,7 @@ def createEventJSON(instructors, meetingsArr):
     events = []
     for x in meetingsArr:
         days = x['days']
+	start_time = x['start_time']
         print(determine_start(days, x['start_time']))
         event = {
             'summary': courseName,
@@ -33,45 +34,12 @@ def createEventJSON(instructors, meetingsArr):
 		'timeZone' : 'America/New_York'
 	     },
             'recurrence' : [
-                CreateRRuleString(findReccurences(days), days)
+                CreateRRuleString(findReccurences(days), days, start_time)
             ]
         }
         events.append(event)
     return events
 
-def findReccurences(days):
-    recurrArr = []
-    if('M' in days):
-        recurrArr.append('MO')
-    if('Tu' in days):
-        recurrArr.append('TU')
-    if('W' in days):
-        recurrArr.append('WE')
-    if('Th' in days):
-        recurrArr.append('TH')
-    if('F' in days):
-        recurrArr.append('FR')
-    
-    return recurrArr
-    
-def CreateRRuleString(recurrArr, days):
-    rrule = "RRULE:FREQ=WEEKLY;BYDAY="
-    for x in recurrArr:
-        rrule = rrule + x + ','
-    rrule = rrule[:-1]
-    rrule = rrule + ';UNTIL'
-    rrule = rrule + str(determine_start(days, x['end_time']).isoformat())
-    
-    return rrule
-    
-    
-def getLocation(building):
-    b = requests.get('http://api.umd.io/v0/map/buildings/' + building)
-    locationString = b.json()['lat'] + ', ' + b.json()['lng']
-    print(locationString)
-    return str(locationString)
-    
-    
 def determine_start(days, timeStr):
     #startTime = datetime.datetime.strptime(datetime.datetime.fromtimestamp(time.mktime(time.strptime(timeStr, '%I:%M%p')), '%H:%M'))
     startTime = datetime.datetime.strptime(timeStr, '%I:%M%p').time()
@@ -133,6 +101,46 @@ def last_weekday(d, weekday):
         days_behind -= 7
     return d + datetime.timedelta(days_behind)
 
+def findReccurences(days):
+    recurrArr = []
+    if('M' in days):
+        recurrArr.append('MO')
+    if('Tu' in days):
+        recurrArr.append('TU')
+    if('W' in days):
+        recurrArr.append('WE')
+    if('Th' in days):
+        recurrArr.append('TH')
+    if('F' in days):
+        recurrArr.append('FR')
+    
+    return recurrArr
+    
+def CreateRRuleString(recurrArr, days, start_time):
+    rrule = "RRULE:FREQ=WEEKLY;BYDAY="
+    for x in recurrArr:
+        rrule = rrule + x + ','
+    rrule = rrule[:-1]
+    rrule = rrule + ';UNTIL='
+    lastTime = str(determine_end(days, start_time).strftime('%Y%m%dT%H%M%S'))
+#    print(str(determine_end(days, x['end_time']).isoformat()))
+
+    rrule = rrule + lastTime + 'Z'
+ #   print(determine_end(days, x['end_time']))    
+    print(rrule)
+    return rrule
+    
+
+  
+def getLocation(building):
+    b = requests.get('http://api.umd.io/v0/map/buildings/' + building)
+    locationString = b.json()['lat'] + ', ' + b.json()['lng']
+    print(locationString)
+    return str(locationString)
+    
+    
+
+
 
 
 
@@ -173,8 +181,9 @@ event = {
 
 print(event) 
 
-e = CAL.events().insert(calendarId='primary',
-        sendNotifications=True, body=events[0]).execute()
+for i in events:
+	e = CAL.events().insert(calendarId='primary',
+        	sendNotifications=True, body=i).execute()
 
 
 print('''*** %r event added:
