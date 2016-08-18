@@ -22,7 +22,7 @@ CAL = build('calendar', 'v3', http=creds.authorize(Http()))
 GMT_OFF = '-07:00'      # PDT/MST/GMT-7
 EVENT = {
     'summary': 'Party',
-    'start':  {'dateTime': str(datetime.datetime.now())},
+    'start':  {'dateTime': '2016-08-21T22:00:00%s' % GMT_OFF},
     'end':    {'dateTime': '2016-08-21T22:00:00%s' % GMT_OFF},
     'attendees': [
         {'email': 'friend1@example.com'},

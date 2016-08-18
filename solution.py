@@ -20,18 +20,19 @@ def createEventJSON(instructors, meetingsArr):
     for x in meetingsArr:
         days = x['days']
         print(determine_start(days, x['start_time']))
+	GMT_OFF = '-07:00'
         event = {
             'summary': courseName,
             'description': str('Taught By: ' + instructors + '. The class is located in ' + x['building'] + ' in room ' + x['room']),
             'location' : getLocation(x['building']),
             'start' : {
-                'dateTime' : str(determine_start(days, x['start_time']).isoformat()),
-                'timeZone' : 'America/New_York'
-            },
+		'dateTime' : str(determine_start(days, x['start_time']).isoformat()),
+		'timeZone' : 'America/New_York'
+             },
             'end' : {
-                'dateTime' : determine_end(days, x['end_time']),
-                'timeZone' : 'America/New_York'
-            },
+		'dateTime' : str(determine_end(days, x['end_time']).isoformat())
+		'timeZone' : 'America/New_York'
+	     },
             'recurrence' : [
                 CreateRRuleString(findReccurences(days))
             ]
@@ -151,8 +152,6 @@ events = createEventJSON(instructors, meetingsArr)
 
 e = CAL.events().insert(calendarId='primary',
         sendNotifications=True, body=events[0]).execute()
-
-
 
 e = CAL.events().insert(calendarId='primary',
         sendNotifications=True, body=events[1]).execute()
