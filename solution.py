@@ -30,7 +30,7 @@ def createEventJSON(instructors, meetingsArr):
 		'timeZone' : 'America/New_York'
              },
             'end' : {
-		'dateTime' : str(determine_end(days, x['end_time']).isoformat())
+		'dateTime' : str(determine_end(days, x['end_time']).isoformat()),
 		'timeZone' : 'America/New_York'
 	     },
             'recurrence' : [
