@@ -3,9 +3,10 @@ from apiclient.discovery import build
 from httplib2 import Http
 from oauth2client import file, client, tools
 import datetime, requests, time, json
+import sys
 
-courseName = 'CMSC131'
-sectionID = '0502'
+courseName = sys.argv[1]
+sectionID = sys.argv[2]
 
 r = requests.get('http://api.umd.io/v0/courses/sections/' + courseName + '-' + sectionID)
 
@@ -62,7 +63,7 @@ def determine_start(days, timeStr):
         return datetime.datetime.combine(date, startTime)
     else:
         return d;
-        
+
 
 def determine_end(days, timeStr):
     #startTime = datetime.datetime.strptime(datetime.datetime.fromtimestamp(time.mktime(time.strptime(timeStr, '%I:%M%p')), '%H:%M'))
@@ -86,8 +87,8 @@ def determine_end(days, timeStr):
         return datetime.datetime.combine(date, endTime)
     else:
         return d;
-    
-    
+
+
 
 def next_weekday(d, weekday):
     days_ahead = weekday - d.weekday()
@@ -113,9 +114,9 @@ def findReccurences(days):
         recurrArr.append('TH')
     if('F' in days):
         recurrArr.append('FR')
-    
+
     return recurrArr
-    
+
 def CreateRRuleString(recurrArr, days, start_time):
     rrule = "RRULE:FREQ=WEEKLY;BYDAY="
     for x in recurrArr:
@@ -126,24 +127,24 @@ def CreateRRuleString(recurrArr, days, start_time):
 #    print(str(determine_end(days, x['end_time']).isoformat()))
 
     rrule = rrule + lastTime + 'Z'
- #   print(determine_end(days, x['end_time']))    
+ #   print(determine_end(days, x['end_time']))
     print(rrule)
     return rrule
-    
 
-  
+
+
 def getLocation(building):
     b = requests.get('http://api.umd.io/v0/map/buildings/' + building)
     locationString = b.json()['lat'] + ', ' + b.json()['lng']
     print(locationString)
     return str(locationString)
-    
-    
 
 
 
 
 
+
+#Main
 try:
     import argparse
     flags = argparse.ArgumentParser(parents=[tools.argparser]).parse_args()
@@ -162,24 +163,7 @@ CAL = build('calendar', 'v3', http=creds.authorize(Http()))
 events = createEventJSON(instructors, meetingsArr)
 print(events[0])
 
-event = {
-	'end': {
-		'timeZone': 'America/New_York',
-		'dateTime': '2016-12-09T16:50:00'
-		},
-	'description': 'Taught By: Evan Golub. The class is located in HJP in room 0226',
-	'summary': 'CMSC131', 
-	'start': {
-		'timeZone': 'America/New_York',
-		'dateTime': '2016-08-29T16:00:00'
-		},
-	'location': '38.98708535, -76.9432766035148',
-	'recurrence':[
-		'RRULE:FREQ=WEEKLY;BYDAY=MO,WE,FR'
-	]
-	}
 
-print(event) 
 
 for i in events:
 	e = CAL.events().insert(calendarId='primary',
@@ -192,3 +176,24 @@ print('''*** %r event added:
         e['start']['dateTime'], e['end']['dateTime']))
 
 
+'''
+Extra code:
+event = {
+	'end': {
+		'timeZone': 'America/New_York',
+		'dateTime': '2016-12-09T16:50:00'
+		},
+	'description': 'Taught By: Evan Golub. The class is located in HJP in room 0226',
+	'summary': 'CMSC131',
+	'start': {
+		'timeZone': 'America/New_York',
+		'dateTime': '2016-08-29T16:00:00'
+		},
+	'location': '38.98708535, -76.9432766035148',
+	'recurrence':[
+		'RRULE:FREQ=WEEKLY;BYDAY=MO,WE,FR'
+	]
+	}
+
+print(event)
+'''
