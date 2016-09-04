@@ -1,5 +1,6 @@
 import os
 from flask import Flask, render_template, request
+from solution1y import mainFunction
 
 app = Flask(__name__)
 
@@ -11,7 +12,8 @@ def index():
 def add_class():
     title = request.form["title"]
     section = request.form["section"]
-    os.system("solution.py " + title.upper() +" "+section.upper())
+    mainFunction(title, section)
+    #os.system('~/Downloads/terpCalendarBuilder/solution.py ' + title.upper() +' '+section.upper())
     return render_template('completed.html')
 
 if __name__ == "__main__":
